@@ -1,0 +1,30 @@
+# Arquivo de ambiente com credenciais
+.env
+
+# Logs
+logs/
+*.log
+
+# Uploads
+uploads/
+
+# Cache
+cache/
+*.cache
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# IDEs
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Builds e Temporários
+*.zip
+_zipbuild/
+.claude/
+_arquivos_desenvolvimento/
