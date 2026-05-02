@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         foreach ($itens as $item) {
             // Inserir item da doação
-            $stmt = $pdo->prepare("INSERT INTO " . tableName('doacoes_itens') . " (doacao_id, medicamento_id, lote, data_validade, quantidade, valor_unitario) 
+            $stmt = $pdo->prepare("INSERT INTO " . tableName('itens_doacao') . " (doacao_id, medicamento_id, lote, data_validade, quantidade, valor_unitario) 
                                    VALUES (?, ?, ?, ?, ?, ?)");
             $stmt->execute([
                 $doacao_id,
@@ -87,7 +87,7 @@ $doadores = fetchAll("SELECT id, nome_completo, tipo, cpf_cnpj FROM " . tableNam
 // Estatísticas do mês
 $stats = [
     'doacoes_mes' => fetchColumn("SELECT COUNT(*) FROM " . tableName('doacoes') . " WHERE MONTH(data_recebimento) = MONTH(CURDATE()) AND YEAR(data_recebimento) = YEAR(CURDATE())") ?? 0,
-    'itens_mes' => fetchColumn("SELECT COALESCE(SUM(di.quantidade), 0) FROM " . tableName('doacoes_itens') . " di INNER JOIN " . tableName('doacoes') . " d ON di.doacao_id = d.id WHERE MONTH(d.data_recebimento) = MONTH(CURDATE()) AND YEAR(d.data_recebimento) = YEAR(CURDATE())") ?? 0,
+    'itens_mes' => fetchColumn("SELECT COALESCE(SUM(di.quantidade), 0) FROM " . tableName('itens_doacao') . " di INNER JOIN " . tableName('doacoes') . " d ON di.doacao_id = d.id WHERE MONTH(d.data_recebimento) = MONTH(CURDATE()) AND YEAR(d.data_recebimento) = YEAR(CURDATE())") ?? 0,
     'valor_mes' => fetchColumn("SELECT COALESCE(SUM(valor_estimado), 0) FROM " . tableName('doacoes') . " WHERE MONTH(data_recebimento) = MONTH(CURDATE()) AND YEAR(data_recebimento) = YEAR(CURDATE())") ?? 0,
     'doadores_ativos' => fetchColumn("SELECT COUNT(*) FROM " . tableName('doadores') . " WHERE ativo = 1") ?? 0
 ];

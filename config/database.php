@@ -15,10 +15,10 @@ loadEnv(__DIR__ . '/../.env');
 // CONFIGURAÇÕES DO BANCO DE DADOS
 // ===================================================================
 
-define('DB_HOST',     env('DB_HOST', 'localhost'));
-define('DB_NAME',     env('DB_NAME', 'farmacia'));
-define('DB_USER',     env('DB_USER', 'root'));
-define('DB_PASS',     env('DB_PASS', ''));
+define('DB_HOST',     env('DB_HOST', '66.179.191.53'));
+define('DB_NAME',     env('DB_NAME', 'projetos'));
+define('DB_USER',     env('DB_USER', 'shiftworks'));
+define('DB_PASS',     env('DB_PASS', 'Jesus7714@!'));
 define('DB_CHARSET',  env('DB_CHARSET', 'utf8mb4'));
 define('TABLE_PREFIX', env('TABLE_PREFIX', 'farmacia_'));
 
@@ -319,7 +319,7 @@ function registrarLog($usuario_id, $acao, $tabela = null, $registro_id = null,
         $ip = $_SERVER['REMOTE_ADDR'] ?? null;
         $user_agent = $_SERVER['HTTP_USER_AGENT'] ?? null;
         
-        insert('logs_sistema', [
+        insert(tableName('logs_sistema'), [
             'usuario_id' => $usuario_id,
             'acao' => $acao,
             'tabela' => $tabela,

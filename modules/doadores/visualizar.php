@@ -13,8 +13,8 @@ if (!$doador) {
 // Buscar histórico de doações
 $doacoes = fetchAll("
     SELECT d.*, u.nome_completo as atendente,
-           (SELECT COUNT(*) FROM " . tableName('doacoes_itens') . " WHERE doacao_id = d.id) as total_itens,
-           (SELECT SUM(quantidade) FROM " . tableName('doacoes_itens') . " WHERE doacao_id = d.id) as total_quantidade
+           (SELECT COUNT(*) FROM " . tableName('itens_doacao') . " WHERE doacao_id = d.id) as total_itens,
+           (SELECT SUM(quantidade) FROM " . tableName('itens_doacao') . " WHERE doacao_id = d.id) as total_quantidade
     FROM " . tableName('doacoes') . " d
     LEFT JOIN " . tableName('usuarios') . " u ON d.usuario_id = u.id
     WHERE d.doador_id = ?

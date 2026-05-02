@@ -119,7 +119,7 @@ function getResumoDoacoes() {
     
     $resumo = [
         'total_doacoes' => fetchColumn("SELECT COUNT(*) FROM " . tableName('doacoes') . " d WHERE $where", $params),
-        'total_itens' => fetchColumn("SELECT COALESCE(SUM(id.quantidade), 0) FROM " . tableName('doacoes_itens') . " id INNER JOIN " . tableName('doacoes') . " d ON id.doacao_id = d.id WHERE $where", $params),
+        'total_itens' => fetchColumn("SELECT COALESCE(SUM(id.quantidade), 0) FROM " . tableName('itens_doacao') . " id INNER JOIN " . tableName('doacoes') . " d ON id.doacao_id = d.id WHERE $where", $params),
         'total_doadores' => fetchColumn("SELECT COUNT(DISTINCT d.doador_id) FROM " . tableName('doacoes') . " d WHERE $where", $params),
         'media_mensal' => fetchColumn("
             SELECT COALESCE(COUNT(*) / GREATEST(DATEDIFF(?, ?) / 30, 1), 0) 
@@ -179,7 +179,7 @@ function getTopDoadores() {
             COALESCE(SUM(id.quantidade), 0) as total_itens
         FROM " . tableName('doadores') . " do
         INNER JOIN " . tableName('doacoes') . " d ON do.id = d.doador_id
-        LEFT JOIN " . tableName('doacoes_itens') . " id ON d.id = id.doacao_id
+        LEFT JOIN " . tableName('itens_doacao') . " id ON d.id = id.doacao_id
         WHERE d.data_recebimento BETWEEN ? AND ?
         GROUP BY do.id, do.nome_completo
         ORDER BY total_doacoes DESC
@@ -211,9 +211,9 @@ function listarDoacoes() {
             d.data_recebimento as data_doacao,
             do.nome_completo as doador_nome,
             u.nome_completo as usuario_nome,
-            (SELECT COUNT(*) FROM " . tableName('doacoes_itens') . " WHERE doacao_id = d.id) as total_itens,
+            (SELECT COUNT(*) FROM " . tableName('itens_doacao') . " WHERE doacao_id = d.id) as total_itens,
             (SELECT GROUP_CONCAT(m.nome SEPARATOR ', ') 
-             FROM " . tableName('doacoes_itens') . " id2 
+             FROM " . tableName('itens_doacao') . " id2 
              INNER JOIN " . tableName('medicamentos') . " m ON id2.medicamento_id = m.id 
              WHERE id2.doacao_id = d.id) as medicamentos
         FROM " . tableName('doacoes') . " d

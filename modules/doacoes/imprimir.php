@@ -34,7 +34,7 @@ if (!$doacao) {
     die('Doação não encontrada.');
 }
 
-$tDoacoesItens = tableName('doacoes_itens');
+$tDoacoesItens = tableName('itens_doacao');
 $tMedicamentos = tableName('medicamentos');
 $itens = fetchAll("
     SELECT 

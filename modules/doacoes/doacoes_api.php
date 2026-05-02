@@ -62,7 +62,7 @@ function outputJson($data) {
 function handleList() {
     try {
         $tDoacoes = tableName('doacoes');
-        $tDoacoesItens = tableName('doacoes_itens');
+        $tDoacoesItens = tableName('itens_doacao');
         $tDoadores = tableName('doadores');
         $tUsuarios = tableName('usuarios');
         $doacoes = fetchAll("
@@ -110,7 +110,7 @@ function handleGet() {
     }
     
     // Buscar itens da doação
-    $tDoacoesItens = tableName('doacoes_itens');
+    $tDoacoesItens = tableName('itens_doacao');
     $tMedicamentos = tableName('medicamentos');
     $itens = fetchAll("
         SELECT 
@@ -130,7 +130,7 @@ function handleGet() {
 function handleGetItens() {
     $id = $_GET['id'] ?? 0;
     
-    $tDoacoesItens = tableName('doacoes_itens');
+    $tDoacoesItens = tableName('itens_doacao');
     $tMedicamentos = tableName('medicamentos');
     $itens = fetchAll("
         SELECT 
@@ -158,7 +158,7 @@ function handleGerarNumero() {
 
 function handleEstatisticas() {
     $tDoacoes = tableName('doacoes');
-    $tDoacoesItens = tableName('doacoes_itens');
+    $tDoacoesItens = tableName('itens_doacao');
     $stats = [
         'total_doacoes' => (int) fetchColumn("SELECT COUNT(*) FROM {$tDoacoes}"),
         'doacoes_mes' => (int) fetchColumn("
