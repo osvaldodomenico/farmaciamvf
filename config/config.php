@@ -1,9 +1,9 @@
 <?php
 // config/database.php
 
-$host = '74.208.68.101'; // Ou o endereço do seu servidor de banco de dados
+$host = '66.179.191.53'; // Ou o endereço do seu servidor de banco de dados
 $db_name = 'projetos'; // O nome do banco que você criou
-$username = 'sistema'; // Seu usuário do MySQL/MariaDB
+$username = 'shiftworks'; // Seu usuário do MySQL/MariaDB
 $password = 'Jesus7714@!';   // Sua senha do MySQL/MariaDB
 $charset = 'utf8mb4';
 
