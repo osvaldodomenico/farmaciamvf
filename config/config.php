@@ -1,10 +1,10 @@
 <?php
 // config/database.php
 
-$host = '66.179.191.53'; // Ou o endereço do seu servidor de banco de dados
-$db_name = 'shiftworks'; // O nome do banco que você criou
-$username = 'root'; // Seu usuário do MySQL/MariaDB
-$password = 'Jesus7714@!2469';   // Sua senha do MySQL/MariaDB
+$host = '74.208.68.101'; // Ou o endereço do seu servidor de banco de dados
+$db_name = 'projetos'; // O nome do banco que você criou
+$username = 'sistema'; // Seu usuário do MySQL/MariaDB
+$password = 'Jesus7714@!';   // Sua senha do MySQL/MariaDB
 $charset = 'utf8mb4';
 
 $dsn = "mysql:host=$host;dbname=$db_name;charset=$charset";

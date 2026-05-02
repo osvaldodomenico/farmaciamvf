@@ -2,10 +2,10 @@
 // src/Models/Database.php
 
 class Database {
-    private static $host = '66.179.191.53'; // Definido em config/database.php, mas pode ser centralizado aqui
-    private static $db_name = 'shiftworks'; // Definido em config/database.php
-    private static $username = 'root'; // Definido em config/database.php
-    private static $password = 'Jesus7714@!2469'; // Definido em config/database.php
+    private static $host = '74.208.68.101'; // Definido em config/database.php, mas pode ser centralizado aqui
+    private static $db_name = 'projetos'; // Definido em config/database.php
+    private static $username = 'sistema'; // Definido em config/database.php
+    private static $password = 'Jesus7714@!'; // Definido em config/database.php
     private static $table_prefix = 'farmacia_';
     private static $conn;
 

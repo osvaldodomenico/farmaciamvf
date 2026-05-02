@@ -110,7 +110,7 @@ function getResumoDoacoes() {
     list($data_inicio, $data_fim) = calcularDatas($periodo, $data_inicio, $data_fim);
     
     $params = [$data_inicio, $data_fim];
-    $where = "d.data_recebimento BETWEEN ? AND ?";
+    $where = "d.data_doacao BETWEEN ? AND ?";
     
     if ($doador_id) {
         $where .= " AND d.doador_id = ?";
@@ -142,20 +142,20 @@ function getGraficoDoacoes() {
     
     if ($dias <= 31) {
         $formato = '%d/%m';
-        $groupBy = 'DATE(data_recebimento)';
+        $groupBy = 'DATE(data_doacao)';
     } else {
         $formato = '%m/%Y';
-        $groupBy = "DATE_FORMAT(data_recebimento, '%Y-%m')";
+        $groupBy = "DATE_FORMAT(data_doacao, '%Y-%m')";
     }
     
     $dados = fetchAll("
         SELECT 
-            DATE_FORMAT(data_recebimento, ?) as label,
+            DATE_FORMAT(data_doacao, ?) as label,
             COUNT(*) as total
         FROM " . tableName('doacoes') . "
-        WHERE data_recebimento BETWEEN ? AND ?
+        WHERE data_doacao BETWEEN ? AND ?
         GROUP BY label
-        ORDER BY MIN(data_recebimento) ASC
+        ORDER BY MIN(data_doacao) ASC
     ", [$formato, $data_inicio, $data_fim]);
     
     echo json_encode([
@@ -180,7 +180,7 @@ function getTopDoadores() {
         FROM " . tableName('doadores') . " do
         INNER JOIN " . tableName('doacoes') . " d ON do.id = d.doador_id
         LEFT JOIN " . tableName('itens_doacao') . " id ON d.id = id.doacao_id
-        WHERE d.data_recebimento BETWEEN ? AND ?
+        WHERE d.data_doacao BETWEEN ? AND ?
         GROUP BY do.id, do.nome_completo
         ORDER BY total_doacoes DESC
         LIMIT 10
@@ -198,7 +198,7 @@ function listarDoacoes() {
     list($data_inicio, $data_fim) = calcularDatas($periodo, $data_inicio, $data_fim);
     
     $params = [$data_inicio, $data_fim];
-    $where = "d.data_recebimento BETWEEN ? AND ?";
+    $where = "d.data_doacao BETWEEN ? AND ?";
     
     if ($doador_id) {
         $where .= " AND d.doador_id = ?";
@@ -208,7 +208,7 @@ function listarDoacoes() {
     $doacoes = fetchAll("
         SELECT 
             d.id,
-            d.data_recebimento as data_doacao,
+            d.data_doacao,
             do.nome_completo as doador_nome,
             u.nome_completo as usuario_nome,
             (SELECT COUNT(*) FROM " . tableName('itens_doacao') . " WHERE doacao_id = d.id) as total_itens,
@@ -220,7 +220,7 @@ function listarDoacoes() {
         LEFT JOIN " . tableName('doadores') . " do ON d.doador_id = do.id
         LEFT JOIN " . tableName('usuarios') . " u ON d.usuario_id = u.id
         WHERE $where
-        ORDER BY d.data_recebimento DESC
+        ORDER BY d.data_doacao DESC
         LIMIT 500
     ", $params);
     
@@ -251,7 +251,7 @@ function getResumoDispensacoes() {
     
     $resumo = [
         'total_dispensacoes' => fetchColumn("SELECT COUNT(*) FROM " . tableName('dispensacoes') . " d WHERE $where", $params),
-        'total_itens' => fetchColumn("SELECT COALESCE(SUM(id.quantidade), 0) FROM " . tableName('dispensacoes_itens') . " id INNER JOIN " . tableName('dispensacoes') . " d ON id.dispensacao_id = d.id WHERE $where", $params),
+        'total_itens' => fetchColumn("SELECT COALESCE(SUM(d.quantidade), 0) FROM " . tableName('dispensacoes') . " d WHERE $where", $params),
         'total_clientes' => fetchColumn("SELECT COUNT(DISTINCT d.cliente_id) FROM " . tableName('dispensacoes') . " d WHERE $where", $params),
         'media_diaria' => fetchColumn("SELECT COUNT(*) / ? FROM " . tableName('dispensacoes') . " d WHERE $where", array_merge([$dias], $params))
     ];
@@ -304,10 +304,9 @@ function getTopMedicamentos() {
         SELECT 
             m.id,
             m.nome,
-            SUM(id.quantidade) as quantidade
-        FROM " . tableName('dispensacoes_itens') . " id
-        INNER JOIN " . tableName('dispensacoes') . " d ON id.dispensacao_id = d.id
-        INNER JOIN " . tableName('medicamentos') . " m ON id.medicamento_id = m.id
+            SUM(d.quantidade) as quantidade
+        FROM " . tableName('dispensacoes') . " d
+        INNER JOIN " . tableName('medicamentos') . " m ON d.medicamento_id = m.id
         WHERE d.data_dispensacao BETWEEN ? AND ?
         GROUP BY m.id, m.nome
         ORDER BY quantidade DESC
@@ -339,14 +338,12 @@ function listarDispensacoes() {
             d.data_dispensacao,
             p.nome_completo as cliente_nome,
             u.nome_completo as usuario_nome,
-            (SELECT COUNT(*) FROM " . tableName('dispensacoes_itens') . " WHERE dispensacao_id = d.id) as total_itens,
-            (SELECT GROUP_CONCAT(m.nome SEPARATOR ', ') 
-             FROM " . tableName('dispensacoes_itens') . " id2 
-             INNER JOIN " . tableName('medicamentos') . " m ON id2.medicamento_id = m.id 
-             WHERE id2.dispensacao_id = d.id) as medicamentos
+            d.quantidade as total_itens,
+            m.nome as medicamentos
         FROM " . tableName('dispensacoes') . " d
         LEFT JOIN " . tableName('clientes') . " p ON d.cliente_id = p.id
         LEFT JOIN " . tableName('usuarios') . " u ON d.usuario_id = u.id
+        LEFT JOIN " . tableName('medicamentos') . " m ON d.medicamento_id = m.id
         WHERE $where
         ORDER BY d.data_dispensacao DESC
         LIMIT 500
@@ -464,7 +461,7 @@ function listarVigilancia() {
             m.id,
             m.nome,
             m.dosagem_concentracao,
-            m.unidade_medida,
+            m.unidade,
             m.localizacao_estoque as prateleira,
             MIN(e.data_fabricacao) as data_producao,
             MIN(e.data_validade) as data_vencimento,
@@ -474,19 +471,19 @@ function listarVigilancia() {
             ON m.id = e.medicamento_id 
             AND e.quantidade_atual > 0
         WHERE m.ativo = 1
-        GROUP BY m.id
+        GROUP BY m.id, m.nome, m.dosagem_concentracao, m.unidade, m.localizacao_estoque
         ORDER BY m.nome ASC
         LIMIT 2000
     ");
     
     foreach ($dados as &$d) {
         $conc = $d['dosagem_concentracao'] ?? '';
-        $um = $d['unidade_medida'] ?? '';
+        $um = $d['unidade'] ?? '';
         if ($um) {
             $conc .= ($um === 'PORCENTAGEM' ? '%' : ($conc ? ' ' : '') . $um);
         }
         $d['composicao'] = $conc ?: '-';
-        unset($d['dosagem_concentracao'], $d['unidade_medida']);
+        unset($d['dosagem_concentracao'], $d['unidade']);
     }
     unset($d);
     
