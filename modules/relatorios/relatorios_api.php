@@ -462,16 +462,16 @@ function listarVigilancia() {
             m.nome,
             m.dosagem_concentracao,
             m.unidade,
-            m.localizacao_estoque as prateleira,
+            MIN(e.localizacao) as prateleira,
             MIN(e.data_fabricacao) as data_producao,
             MIN(e.data_validade) as data_vencimento,
             COALESCE(SUM(e.quantidade_atual), 0) as estoque_total
         FROM {$tMedicamentos} m
-        LEFT JOIN {$tEstoque} e 
-            ON m.id = e.medicamento_id 
+        LEFT JOIN {$tEstoque} e
+            ON m.id = e.medicamento_id
             AND e.quantidade_atual > 0
         WHERE m.ativo = 1
-        GROUP BY m.id, m.nome, m.dosagem_concentracao, m.unidade, m.localizacao_estoque
+        GROUP BY m.id, m.nome, m.dosagem_concentracao, m.unidade
         ORDER BY m.nome ASC
         LIMIT 2000
     ");
